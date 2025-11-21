@@ -22,12 +22,16 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
+            $user = Auth::user()->load('role', 'packages');
+            
             return response()->json([
                 'user' => [
-                    'id' => Auth::user()->id,
-                    'name' => Auth::user()->name,
-                    'email' => Auth::user()->email,
-                    'role' => Auth::user()->role,
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role ? $user->role->name : null,
+                    'role_slug' => $user->role ? $user->role->slug : null,
+                    'permissions' => $user->getAllPermissions()->pluck('slug')->toArray(),
                 ],
                 'message' => 'Login successful',
             ]);
@@ -52,12 +56,16 @@ class AuthController extends Controller
     public function user(Request $request)
     {
         if (Auth::check()) {
+            $user = Auth::user()->load('role', 'packages');
+            
             return response()->json([
                 'user' => [
-                    'id' => Auth::user()->id,
-                    'name' => Auth::user()->name,
-                    'email' => Auth::user()->email,
-                    'role' => Auth::user()->role,
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role ? $user->role->name : null,
+                    'role_slug' => $user->role ? $user->role->slug : null,
+                    'permissions' => $user->getAllPermissions()->pluck('slug')->toArray(),
                 ],
             ]);
         }

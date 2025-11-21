@@ -5,6 +5,7 @@ import FormPage from "@/pages/FormPage"
 import Profile from "@/pages/Profile"
 import CreateUser from "@/pages/CreateUser"
 import Users from "@/pages/Users"
+import Packages from "@/pages/Packages"
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout"
 import { AuthProvider, useAuth } from "@/contexts/AuthContext"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
@@ -54,6 +55,16 @@ function AppRoutes() {
           <ProtectedRoute>
             <DashboardLayout currentPath="/users">
               <Users />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/packages"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout currentPath="/packages">
+              <Packages />
             </DashboardLayout>
           </ProtectedRoute>
         }

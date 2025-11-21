@@ -23,4 +23,16 @@ export {
 } from "./dropdown-menu"
 export { Separator } from "./separator"
 export { Label } from "./label"
+export {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogClose,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "./dialog"
 

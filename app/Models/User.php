@@ -21,7 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+        'role_id',
         'created_by',
     ];
 
@@ -62,5 +62,71 @@ class User extends Authenticatable
     public function createdUsers()
     {
         return $this->hasMany(User::class, 'created_by');
+    }
+
+    /**
+     * Get the user's role.
+     */
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Get the user's packages.
+     */
+    public function packages()
+    {
+        return $this->belongsToMany(Package::class, 'user_packages');
+    }
+
+    /**
+     * Check if user has permission (via role or package).
+     */
+    public function hasPermission($permissionSlug)
+    {
+        // Super Admin has all permissions
+        if ($this->role && $this->role->slug === 'super-admin') {
+            return true;
+        }
+
+        // Check role permissions
+        if ($this->role && $this->role->hasPermission($permissionSlug)) {
+            return true;
+        }
+
+        // Check package permissions
+        foreach ($this->packages as $package) {
+            if ($package->permissions()->where('slug', $permissionSlug)->exists()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get all user permissions (from role + packages).
+     */
+    public function getAllPermissions()
+    {
+        $permissions = collect();
+
+        // Super Admin has all permissions
+        if ($this->role && $this->role->slug === 'super-admin') {
+            return \App\Models\Permission::all();
+        }
+
+        // Add role permissions
+        if ($this->role) {
+            $permissions = $permissions->merge($this->role->permissions);
+        }
+
+        // Add package permissions
+        foreach ($this->packages as $package) {
+            $permissions = $permissions->merge($package->permissions);
+        }
+
+        return $permissions->unique('id');
     }
 }

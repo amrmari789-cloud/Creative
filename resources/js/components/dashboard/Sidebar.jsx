@@ -3,18 +3,20 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { Link } from "react-router-dom"
 import { CreativeAssociateLogo } from "@/components/CreativeAssociateLogo"
+import { usePermissions } from "@/hooks/usePermissions"
 
 const menuItems = [
-  { icon: "📊", label: "Overview", path: "/" },
-  { icon: "📋", label: "Inspections", path: "/orders" },
-  { icon: "🧾", label: "Certificates", path: "/certificates" },
-  { icon: "👥", label: "Clients", path: "/customers" },
-  { icon: "🚚", label: "Fleet", path: "/fleet" },
-  { icon: "📈", label: "Analytics", path: "/analytics" },
-  { icon: "➕", label: "User Create", path: "/users/create" },
-  { icon: "👥", label: "Users", path: "/users" },
-  { icon: "👤", label: "Profile", path: "/profile" },
-  { icon: "⚙️", label: "Settings", path: "/settings" },
+  { icon: "📊", label: "Overview", path: "/", permission: "view-dashboard" },
+  { icon: "📋", label: "Inspections", path: "/orders", permission: "view-inspections" },
+  { icon: "🧾", label: "Certificates", path: "/certificates", permission: "view-certificates" },
+  { icon: "👥", label: "Clients", path: "/customers", permission: "view-clients" },
+  { icon: "🚚", label: "Fleet", path: "/fleet", permission: "view-fleet" },
+  { icon: "📈", label: "Analytics", path: "/analytics", permission: "view-analytics" },
+  { icon: "➕", label: "User Create", path: "/users/create", permission: "create-users" },
+  { icon: "👥", label: "Users", path: "/users", permission: "view-users" },
+  { icon: "📦", label: "Packages", path: "/packages", permission: "edit-settings" },
+  { icon: "👤", label: "Profile", path: "/profile", permission: "view-profile" },
+  { icon: "⚙️", label: "Settings", path: "/settings", permission: "view-settings" },
 ]
 
 const focusHighlights = [
@@ -30,6 +32,13 @@ export function Sidebar({
   isMobile = false,
   onCloseMobile,
 }) {
+  const { hasPermission } = usePermissions()
+
+  // Filter menu items based on permissions
+  const visibleMenuItems = menuItems.filter(item => 
+    !item.permission || hasPermission(item.permission)
+  )
+
   return (
     <div
       className={cn(
@@ -73,7 +82,7 @@ export function Sidebar({
 
       <div className="flex-1 overflow-y-auto px-2 pb-4">
         <nav className={cn("space-y-1 px-4", isCollapsed && "px-2")}>
-          {menuItems.map((item) => {
+          {visibleMenuItems.map((item) => {
             const isActive = currentPath === item.path
             return (
               <div key={item.path} className="group relative">
